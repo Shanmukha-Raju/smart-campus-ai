@@ -12,26 +12,34 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 
 function App() {
   const navigate = useNavigate();
-  const navigateRef = useRef(navigate); // ✅ store in ref so useEffect dep is stable
+  const navigateRef = useRef(navigate);
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    // Keep ref current (in case navigate identity ever changes)
     navigateRef.current = navigate;
   }, [navigate]);
 
   useEffect(() => {
-    // Runs exactly once on mount — auth state listener
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         try {
           const snap = await getDoc(doc(db, "users", currentUser.uid));
-          const role = snap.exists() ? snap.data().role : "student";
-          // Use ref to navigate — no dependency needed in this effect
-          if (role === "teacher") {
-            navigateRef.current("/teacher", { replace: true });
+
+          if (!snap.exists()) {
+            // ── NEW USER ──────────────────────────────────────────────────────
+            // No Firestore record yet — this means they just signed in with
+            // Google for the first time. Stay on login page so the profile
+            // completion form in Login.js can show and collect their details.
+            navigateRef.current("/", { replace: true });
           } else {
-            navigateRef.current("/student", { replace: true });
+            // ── RETURNING USER ────────────────────────────────────────────────
+            // Firestore record exists — redirect to their correct dashboard
+            const role = snap.data().role;
+            if (role === "teacher") {
+              navigateRef.current("/teacher", { replace: true });
+            } else {
+              navigateRef.current("/student", { replace: true });
+            }
           }
         } catch (err) {
           console.error("Role fetch error:", err);
@@ -42,7 +50,7 @@ function App() {
     });
 
     return () => unsubscribe();
-  }, []); // ✅ truly stable — no warnings
+  }, []);
 
   if (!authReady) {
     return (
@@ -63,11 +71,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/"         element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/student" element={<StudentDashboard />} />
-      <Route path="/teacher" element={<TeacherDashboard />} />
-      <Route path="*" element={<Login />} />
+      <Route path="/student"  element={<StudentDashboard />} />
+      <Route path="/teacher"  element={<TeacherDashboard />} />
+      <Route path="*"         element={<Login />} />
     </Routes>
   );
 }
