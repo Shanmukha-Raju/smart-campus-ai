@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { db, auth } from "../firebase/config";
 import {
   collection, getDocs, addDoc, query,
-  where, getDoc, doc, Timestamp
+  where, Timestamp
 } from "firebase/firestore";
 
 const API = process.env.REACT_APP_BACKEND_URL;

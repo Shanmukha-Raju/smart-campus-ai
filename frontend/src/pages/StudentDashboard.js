@@ -309,7 +309,7 @@ function StudentDashboard() {
     const subMap = {};
     subSnap.forEach((d) => { subMap[d.data().assignmentId] = { id: d.id, ...d.data() }; });
     setSubmitted(subMap);
-  }, []);
+  }, [studentClass]);
 
   useEffect(() => {
     if (hasFetched.current) return;
