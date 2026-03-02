@@ -1,0 +1,23 @@
+# ──────────────────────────────────────────────────────────────
+# Smart Campus AI — Backend Dockerfile
+# Node.js 18 + Express + Gemini AI proxy
+# ──────────────────────────────────────────────────────────────
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for caching
+COPY package.json package-lock.json ./
+
+# Install only production dependencies (no devDependencies)
+RUN npm install --omit=dev
+
+# Copy all backend source files
+COPY . .
+
+# Expose the API port
+EXPOSE 5000
+
+# Start the Express server
+CMD ["node", "server.js"]

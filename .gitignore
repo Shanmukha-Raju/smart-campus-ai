@@ -1,0 +1,13 @@
+# Root environment file — contains your Gemini API key
+.env
+
+# Docker build artifacts
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/

@@ -1,0 +1,40 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Smart Campus AI — Docker Compose
+# Runs 2 containers:
+#   1. backend  — Node.js/Express on port 5000
+#   2. frontend — React (built) served by Nginx on port 3000
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── BACKEND ────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend          # folder that contains Dockerfile.backend
+      dockerfile: Dockerfile.backend
+    container_name: smartcampus_backend
+    ports:
+      - "5000:5000"               # host:container
+    environment:
+      # ⚠️  Put your real Gemini API key here OR use a .env file (see below)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=5000
+    restart: unless-stopped       # auto-restart if the server crashes
+
+  # ── FRONTEND ───────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend         # folder that contains Dockerfile.frontend
+      dockerfile: Dockerfile.frontend
+      args:
+        # This tells React where the backend API is at BUILD TIME
+        # Use the machine's IP or domain — not localhost (that means inside the container)
+        - REACT_APP_BACKEND_URL=http://localhost:5000
+    container_name: smartcampus_frontend
+    ports:
+      - "3000:80"                 # host port 3000 → container Nginx port 80
+    depends_on:
+      - backend                   # wait for backend to start first
+    restart: unless-stopped
