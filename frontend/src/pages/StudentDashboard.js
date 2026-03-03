@@ -14,8 +14,8 @@ import StudyPlan from "./StudyPlan";
 
 // ── Cloudinary unsigned upload ────────────────────────────────────────────────
 // ⚠️  Replace with your own values from cloudinary.com (free account)
-const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";        // ← change this
-const CLOUDINARY_UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";  // ← change this
+const CLOUDINARY_CLOUD_NAME = "dhjuwsr9b";        
+const CLOUDINARY_UPLOAD_PRESET = "smart_campus";  
 
 async function uploadToCloudinary(file) {
   const formData = new FormData();
