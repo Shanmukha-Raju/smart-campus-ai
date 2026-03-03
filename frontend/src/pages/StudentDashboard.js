@@ -14,8 +14,9 @@ import StudyPlan from "./StudyPlan";
 
 // ── Cloudinary unsigned upload ────────────────────────────────────────────────
 // ⚠️  Replace with your own values from cloudinary.com (free account)
-const CLOUDINARY_CLOUD_NAME = "dhjuwsr9b";        
-const CLOUDINARY_UPLOAD_PRESET = "smart_campus";
+const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";        // ← change this
+const CLOUDINARY_UPLOAD_PRESET = "YOUR_UPLOAD_PRESET";  // ← change this
+
 async function uploadToCloudinary(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -268,10 +269,12 @@ function StudentDashboard() {
     const uid = auth.currentUser.uid;
 
     const userSnap = await getDoc(doc(db, "users", uid));
+    let currentClass = ""; // local var — state updates are async
     if (userSnap.exists()) {
       const d = userSnap.data();
       setStudentName(d.name || "");
-      setStudentClass(d.studentClass || "");
+      currentClass = d.studentClass || "";
+      setStudentClass(currentClass);
       setRollNo(d.rollNo ?? "");
     }
 
@@ -291,7 +294,8 @@ function StudentDashboard() {
     annSnap.forEach((d) => {
       const a = { id: d.id, ...d.data() };
       // Show if targeted at all students or this student's class
-      if (a.targetClass === "ALL" || a.targetClass === studentClass) {
+      const sameClass = a.targetClass?.trim().toLowerCase() === currentClass.trim().toLowerCase();
+      if (a.targetClass === "ALL" || sameClass) {
         annList.push(a);
       }
     });
@@ -309,7 +313,7 @@ function StudentDashboard() {
     const subMap = {};
     subSnap.forEach((d) => { subMap[d.data().assignmentId] = { id: d.id, ...d.data() }; });
     setSubmitted(subMap);
-  }, [studentClass]);
+  }, []);
 
   useEffect(() => {
     if (hasFetched.current) return;
